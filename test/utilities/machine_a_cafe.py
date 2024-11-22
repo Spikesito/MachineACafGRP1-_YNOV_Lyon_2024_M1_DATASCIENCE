@@ -1,0 +1,2 @@
+class MachineACafe:
+    pass

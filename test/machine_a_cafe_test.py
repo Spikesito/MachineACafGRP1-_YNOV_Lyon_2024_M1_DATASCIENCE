@@ -1,5 +1,9 @@
 import unittest
 
+from utilities.brewer import Brewer
+from utilities.machine_a_cafe import MachineACafe
+from utilities.lecteur_carte_bancaire import LecteurCB
+
 class MyTestCase(unittest.TestCase):
 
     def test_cas_nominal(self):
