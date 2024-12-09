@@ -5,9 +5,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.hardware.brewer import BrewerInterface
 
-class BrewerSurveillantLesAppels(BrewerInterface):
-    def __init__(self):
-        self.__make_a_coffee_appele = False
+class BrewerFake(BrewerInterface):
+    def __init__(self, has_coffee=True):
+        self.has_coffee = has_coffee
+        self._make_a_coffee_appele = False
 
     def pour_sugar(self) -> bool:
         pass
@@ -25,7 +26,4 @@ class BrewerSurveillantLesAppels(BrewerInterface):
         pass
 
     def make_a_coffee(self) -> bool:
-        self.__make_a_coffee_appele = True
-
-    def make_a_coffee_appele(self):
-        return self.__make_a_coffee_appele
+        return True
