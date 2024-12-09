@@ -26,4 +26,7 @@ class BrewerFake(BrewerInterface):
         pass
 
     def make_a_coffee(self) -> bool:
-        return True
+        if self.has_coffee:
+            self._make_a_coffee_appele = True
+            return True
+        return False
