@@ -12,4 +12,10 @@ class MachineACafe:
         self._brewer = brewer
 
     def _credit_card_callback(self, card_handle: CardHandleInterface) -> None:
-        self._brewer.make_a_coffee()
+        carte_debitee = card_handle.try_charge_amount(50)
+        if not carte_debitee:
+            return
+        
+        make_a_coffee_appele = self._brewer.make_a_coffee()
+        if not make_a_coffee_appele:
+            card_handle.refund(50)
