@@ -5,9 +5,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.hardware.creditcard import CreditCardInterface, CardHandleInterface
 
-class CreditCardSpy(CreditCardInterface):
-    def __init__(self):
+class CreditCardFake(CreditCardInterface):
+    def __init__(self, has_provision=True):
         self._card_detected_callback = None
+        self._has_provision = has_provision
 
     def simuler_cb_detectee(self):
         self._card_detected_callback(None)
