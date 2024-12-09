@@ -1,23 +1,23 @@
 import unittest
 
-from utilities.brewer import Brewer
+from utilities.brewer import BrewerSurveillantLesAppels
 from utilities.machine_a_cafe import MachineACafe
-from utilities.lecteur_carte_bancaire import LecteurCB
+from utilities.lecteur_carte_bancaire import CreditCardSpy
 
 class MyTestCase(unittest.TestCase):
 
     def test_cas_nominal(self):
         # ETANT DONNE une machine à café
-        lecteur_cb = LecteurCB()
-        brewer = Brewer()
-        machine_a_cafe = MachineACafe()
+        lecteur_cb = CreditCardSpy()
+        brewer = BrewerSurveillantLesAppels()
+        machine_a_cafe = MachineACafe(brewer, lecteur_cb)
 
         # QUAND une CB est détectée
         lecteur_cb.simuler_cb_detectee()
 
         # ALORS un café est commandé au hardware
         # ET 50cts ont été débités (pas encore)
-        self.assertTrue(brewer.commande_cafe_appele())
+        self.assertTrue(brewer.make_a_coffee_appele())
     
     # ETANT DONNE une machine à café manquant de café
     # QUAND une CB est détectée
