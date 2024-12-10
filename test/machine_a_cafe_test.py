@@ -33,9 +33,11 @@ class MyTestCase(unittest.TestCase):
         # ETANT DONNE une machine à café manquant de café
         lecteur_cb_fake = LecteurCBFake()
         brewer_fake = BrewerFake(is_defaillant=True)
+        button_panel = ButtonPanelFake()
         machine_a_cafe = (MachineACafeBuilder()
                           .ayant_pour_brewer(brewer_fake)
                           .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel)
                           .build())
 
         # QUAND une CB est détectée
@@ -47,6 +49,9 @@ class MyTestCase(unittest.TestCase):
 
         # ET la carte n'a pas été débitée
         self.assertEqual(0, carte._somme_operations)
+
+        # ET la LED d'avertissement s'allume
+        self.assertTrue(button_panel.get_lungo_warning_state())
     
     def test_cb_manque_provision(self):
         # ETANT DONNE une machine à café
@@ -98,24 +103,6 @@ class MyTestCase(unittest.TestCase):
         # QUAND aucune CB n'est détectée
         # ALORS aucun café n'est demandé au hardware
         self.assertFalse(brewer_spy.make_a_coffee())
-
-    def test_led_expresso_defaillante(self):
-        # ETANT DONNE une machine à café manquant de café
-        lecteur_cb_fake = LecteurCBFake()
-        brewer_fake = BrewerFake(is_defaillant=True)
-        button_panel = ButtonPanelFake()
-        machine_a_cafe = (MachineACafeBuilder()
-                          .ayant_pour_brewer(brewer_fake)
-                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
-                          .ayant_pour_button_panel(button_panel)
-                          .build())
-
-        # QUAND une CB est détectée
-        carte = CarteFake.default()
-        lecteur_cb_fake.simuler_cb_detectee(carte)
-
-        # Alors la LED d'avertissement s'allume
-        self.assertTrue(button_panel.get_lungo_warning_state())
 
     def test_led_machine_en_manque_eau(self):
         # ETANT DONNE une machine à café avec un brewer défaillant
