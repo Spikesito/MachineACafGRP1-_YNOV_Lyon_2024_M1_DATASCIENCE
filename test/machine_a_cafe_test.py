@@ -85,9 +85,18 @@ class MyTestCase(unittest.TestCase):
         # ET aucune somme n'a été débitée
         self.assertEqual(0, carte._somme_operations)
         
-    # ETANT DONNE une machine à café
-    # QUAND aucune CB n'est détectée
-    # ALORS aucun café n'est demandé au hardware
+    def test_pas_de_cb(self):
+        # ETANT DONNE une machine à café
+        lecteur_cb_fake = LecteurCBFake()
+        brewer_spy = BrewerSpy()
+        machine_a_cafe = (MachineACafeBuilder()
+                          .ayant_pour_brewer(brewer_spy)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .build())
+        
+        # QUAND aucune CB n'est détectée
+        # ALORS aucun café n'est demandé au hardware
+        self.assertFalse(brewer_spy.make_a_coffee())
 
 
 if __name__ == '__main__':
