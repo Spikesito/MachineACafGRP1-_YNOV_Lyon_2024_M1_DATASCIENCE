@@ -24,6 +24,8 @@ class BrewerFake(BrewerInterface):
         pass
 
     def try_pull_water(self) -> bool:
+        if self._no_water:
+            return False
         return True
 
     def make_a_coffee(self) -> bool:

@@ -5,6 +5,7 @@ from utilities.brewerFake import BrewerFake
 from utilities.lecteurCBFake import LecteurCBFake
 from utilities.carteFake import CarteFake
 from utilities.buttonPanelFake import ButtonPanelFake
+from src.hardware.buttonpanel import ButtonCode
 from utilities.machine_a_cafe import MachineACafeBuilder
 
 class MyTestCase(unittest.TestCase):
@@ -111,7 +112,7 @@ class MyTestCase(unittest.TestCase):
                           .build())
 
         # QUAND le bouton BTN_LUNGO est pressé
-        button_panel.simuler_button_pressed(0) # 0 est le code du café allongé
+        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO) # 0 est le code du café allongé
 
         # ALORS la LED d'avertissement s'allume
         self.assertTrue(button_panel.get_lungo_warning_state()) # False par défaut car la LED n'est pas encore rouge

@@ -10,7 +10,7 @@ class ButtonPanelFake(ButtonPanelInterface):
         self.lungo_warning_state = False  # Capture uniquement le dernier état
 
     def simuler_button_pressed(self, button) -> None:
-        self._button_callback = button
+        self._button_callback(button)
 
     def register_button_pressed_callback(self, button_callback):
         self._button_callback = button_callback
