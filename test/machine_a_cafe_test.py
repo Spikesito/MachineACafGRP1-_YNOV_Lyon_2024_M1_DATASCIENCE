@@ -72,7 +72,7 @@ class MyTestCase(unittest.TestCase):
     def test_manque_deau(self):
         # ETANT DONNE une machine à café manquant d'eau
         lecteur_cb_fake = LecteurCBFake()
-        brewer_fake = BrewerFake(no_more_water=True)
+        brewer_fake = BrewerFake(no_water=True)
         machine_a_cafe = (MachineACafeBuilder()
                           .ayant_pour_brewer(brewer_fake)
                           .ayant_pour_lecteur_cb(lecteur_cb_fake)
