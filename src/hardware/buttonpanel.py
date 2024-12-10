@@ -1,6 +1,6 @@
 import abc
 
-from hardware.buttoncode import ButtonCode
+from src.hardware.buttoncode import ButtonCode
 
 
 class ButtonPanelInterface(abc.ABC):

@@ -4,6 +4,7 @@ from utilities.brewerSpy import BrewerSpy
 from utilities.brewerFake import BrewerFake
 from utilities.lecteurCBFake import LecteurCBFake
 from utilities.carteFake import CarteFake
+from utilities.buttonPanelFake import ButtonPanelFake
 from utilities.machine_a_cafe import MachineACafeBuilder
 
 class MyTestCase(unittest.TestCase):
@@ -97,6 +98,23 @@ class MyTestCase(unittest.TestCase):
         # QUAND aucune CB n'est détectée
         # ALORS aucun café n'est demandé au hardware
         self.assertFalse(brewer_spy.make_a_coffee())
+
+    def test_led_machine_en_erreur(self):
+        # ETANT DONNE une machine à café avec un brewer défaillant
+        brewer_fake = BrewerFake(no_water=True)  # Simule le manque d'eau
+        lecteur_cb_fake = LecteurCBFake()
+        button_panel = ButtonPanelFake()
+        machine_a_cafe = (MachineACafeBuilder()
+                          .ayant_pour_brewer(brewer_fake)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel)
+                          .build())
+
+        # QUAND le bouton BTN_LUNGO est pressé
+        button_panel.simuler_button_pressed(0) # 0 est le code du café allongé
+
+        # ALORS la LED d'avertissement s'allume
+        self.assertTrue(button_panel.get_lungo_warning_state()) # False par défaut car la LED n'est pas encore rouge
 
 
 if __name__ == '__main__':
