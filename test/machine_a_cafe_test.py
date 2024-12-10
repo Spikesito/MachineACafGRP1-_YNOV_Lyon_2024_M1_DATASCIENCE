@@ -11,9 +11,9 @@ class MyTestCase(unittest.TestCase):
     def test_cas_nominal(self):
         # ETANT DONNE une machine à café
         lecteur_cb_fake = LecteurCBFake()
-        brewer_spy = BrewerSpy()
+        brewer_fake = BrewerFake()
         machine_a_cafe = (MachineACafeBuilder()
-                          .ayant_pour_brewer(brewer_spy)
+                          .ayant_pour_brewer(brewer_fake)
                           .ayant_pour_lecteur_cb(lecteur_cb_fake)
                           .build())
 
@@ -22,7 +22,7 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS un café est commandé au hardware
-        self.assertTrue(brewer_spy.make_a_coffee())
+        self.assertTrue(brewer_fake.make_a_coffee())
 
         # ET 50cts ont été débités (pas encore)
         self.assertEqual(-50, carte._somme_operations)
@@ -70,9 +70,9 @@ class MyTestCase(unittest.TestCase):
     def test_manque_deau(self):
         # ETANT DONNE une machine à café manquant d'eau
         lecteur_cb_fake = LecteurCBFake()
-        brewer_spy = BrewerFake(no_water=True)
+        brewer_fake = BrewerFake(no_water=True)
         machine_a_cafe = (MachineACafeBuilder()
-                          .ayant_pour_brewer(brewer_spy)
+                          .ayant_pour_brewer(brewer_fake)
                           .ayant_pour_lecteur_cb(lecteur_cb_fake)
                           .build())
         
@@ -81,7 +81,7 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS aucun café n'est demandé au hardware
-        self.assertFalse(brewer_spy.make_a_coffee())
+        self.assertFalse(brewer_fake.make_a_coffee())
         # ET aucune somme n'a été débitée
         self.assertEqual(0, carte._somme_operations)
         

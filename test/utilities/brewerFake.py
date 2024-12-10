@@ -27,7 +27,7 @@ class BrewerFake(BrewerInterface):
         return True
 
     def make_a_coffee(self) -> bool:
-        if not self._is_defaillant:
+        if not self._is_defaillant and not self._no_water:
             self._make_a_coffee_appele = True
             return True
         return False
