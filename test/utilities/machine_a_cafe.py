@@ -5,9 +5,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.hardware.brewer import BrewerInterface
 from src.hardware.creditcard import CreditCardInterface
+from src.hardware.buttonpanel import ButtonPanelInterface
 from src.machine_a_cafe import MachineACafe
 from utilities.brewerSpy import BrewerSpy
-from utilities.brewerDefaillantFake import BrewerDefaillantFake
 from utilities.lecteurCBFake import LecteurCBFake
 
 class MachineACafeBuilder(MachineACafe):
@@ -26,5 +26,5 @@ class MachineACafeBuilder(MachineACafe):
         self._lecteur_cb = lecteur_cb
         return self
     
-    def brewer_defaillant(self):
-        return self.ayant_pour_brewer(BrewerDefaillantFake)
+    def ayant_pour_button_panel(self, button_panel: ButtonPanelInterface):
+        return self

@@ -1,7 +1,6 @@
 import abc
 
-from hardware.buttoncode import ButtonCode
-
+from src.hardware.buttoncode import ButtonCode
 
 class ButtonPanelInterface(abc.ABC):
     # Enregistre un callback appelé lors de l'appui sur un bouton de la façade avant
