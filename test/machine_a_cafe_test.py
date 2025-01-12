@@ -79,7 +79,7 @@ class MyTestCase(machine_a_cafe_matcher):
         self.assertCarteDebitee(carte, 0)
 
     def test_nominal_lungo(self):
-        # ETANT DONNE une machine à café normale
+        # ETANT DONNE une machine à café
         brewer_fake = BrewerFake() 
         lecteur_cb_fake = LecteurCBFake()
         button_panel = ButtonPanelFake()
