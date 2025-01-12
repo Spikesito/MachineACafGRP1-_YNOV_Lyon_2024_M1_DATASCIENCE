@@ -8,6 +8,7 @@ from utilities.buttonPanelFake import ButtonPanelFake
 from src.hardware.buttonpanel import ButtonCode
 from utilities.machine_a_cafe import MachineACafeBuilder
 from test.machine_a_cafe_matcher import machine_a_cafe_matcher
+from utilities.CupProviderFake import CupProviderFake
 
 class MyTestCase(machine_a_cafe_matcher):
 
@@ -167,6 +168,42 @@ class MyTestCase(machine_a_cafe_matcher):
         self.assertLedWarning(button_panel, False)    
         # ET la carte a été débitée
         self.assertCarteDebitee(carte, -50)
+
+    def test_ajout_sucre_et_touillette(self):
+        # ETANT DONNE une machine à café avec un brewer et un fournisseur de touillette
+        brewer_spy = BrewerSpy()
+        lecteur_cb_fake = LecteurCBFake()
+        button_panel_fake = ButtonPanelFake()
+        cup_provider_fake = CupProviderFake()
+
+        machine_a_cafe = (MachineACafeBuilder()
+                        .ayant_pour_brewer(brewer_spy)
+                        .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                        .ayant_pour_button_panel(button_panel_fake)
+                        .ayant_pour_cup_provider(cup_provider_fake)
+                        .build())
+
+        # ET une CB est détectée
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        # Test de la détection de la carte et du débit
+        self.test_cb_detectee(lecteur_cb_fake, carte, -50)
+
+        # QUAND on choisit de préparer un café avec 3 doses de sucre
+        machine_a_cafe.prepare_coffee(sugar_quantity=3)
+
+        # ALORS la quantité de sucre doit être de 3
+        self.assertEqual(brewer_spy.get_sugar_quantity(), 3)
+
+        # ET une touillette doit être fournie
+        self.assertTrue(cup_provider_fake.is_stirrer_provided())
+
+        # Le café doit être préparé
+        self.assertTrue(brewer_spy.make_a_coffee_appele())
+
+    
+
 
 
 if __name__ == '__main__':

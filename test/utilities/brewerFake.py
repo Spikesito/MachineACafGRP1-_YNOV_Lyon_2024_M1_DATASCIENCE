@@ -11,9 +11,13 @@ class BrewerFake(BrewerInterface):
         self._no_more_water = no_more_water
         self._no_water = no_water
         self._make_a_coffee_appele = False
+        self._quantity_sugar = 0
 
-    def pour_sugar(self) -> bool:
-        pass
+    def pour_sugar(self,quantity : int) -> bool:
+        if  0 <= quantity <= 5:
+            self._quantity_sugar = quantity
+            return True 
+        return False
 
     def pour_chocolate(self) -> bool:
         pass
