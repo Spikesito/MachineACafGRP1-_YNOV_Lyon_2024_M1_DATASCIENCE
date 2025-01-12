@@ -7,8 +7,9 @@ from utilities.carteFake import CarteFake
 from utilities.buttonPanelFake import ButtonPanelFake
 from src.hardware.buttonpanel import ButtonCode
 from utilities.machine_a_cafe import MachineACafeBuilder
+from test.machine_a_cafe_matcher import machine_a_cafe_matcher
 
-class MyTestCase(unittest.TestCase):
+class MyTestCase(machine_a_cafe_matcher):
 
     def test_cas_nominal(self):
         # ETANT DONNE une machine à café
@@ -24,11 +25,10 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS un café est commandé au hardware
-        self.assertTrue(brewer_fake.make_a_coffee())
+        self.assertCafeCommande(brewer_fake, True)
+        # ET 50cts ont été débités
+        self.assertCarteDebitee(carte, -50)
 
-        # ET 50cts ont été débités (pas encore)
-        self.assertEqual(-50, carte._somme_operations)
-    
     def test_defaillant(self):
         # ETANT DONNE une machine à café manquant de café
         lecteur_cb_fake = LecteurCBFake()
@@ -45,14 +45,12 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS aucun café n'est demandé au hardware
-        self.assertFalse(brewer_fake.make_a_coffee())
-
+        self.assertCafeCommande(brewer_fake, False)
         # ET la carte n'a pas été débitée
-        self.assertEqual(0, carte._somme_operations)
-
+        self.assertCarteDebitee(carte, 0)
         # ET la LED d'avertissement s'allume
-        self.assertTrue(button_panel.get_lungo_warning_state())
-    
+        self.assertLedWarning(button_panel, True)
+
     def test_cb_manque_provision(self):
         # ETANT DONNE une machine à café
         lecteur_cb_fake = LecteurCBFake()
@@ -69,9 +67,9 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS aucun café n'est demandé au hardware
-        self.assertFalse(brewer_spy.make_a_coffee())
+        self.assertCafeCommande(brewer_spy, False)
         # ET la carte n'a pas été débitée
-        self.assertEqual(0, carte._somme_operations)
+        self.assertCarteDebitee(carte, 0)
 
     def test_manque_deau(self):
         # ETANT DONNE une machine à café manquant d'eau
@@ -87,10 +85,10 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS aucun café n'est demandé au hardware
-        self.assertFalse(brewer_fake.make_a_coffee())
+        self.assertCafeCommande(brewer_fake, False)
         # ET aucune somme n'a été débitée
-        self.assertEqual(0, carte._somme_operations)
-        
+        self.assertCarteDebitee(carte, 0)
+
     def test_pas_de_cb(self):
         # ETANT DONNE une machine à café
         lecteur_cb_fake = LecteurCBFake()
@@ -102,7 +100,7 @@ class MyTestCase(unittest.TestCase):
         
         # QUAND aucune CB n'est détectée
         # ALORS aucun café n'est demandé au hardware
-        self.assertFalse(brewer_spy.make_a_coffee())
+        self.assertCafeCommande(brewer_spy, False)
 
     def test_led_machine_en_manque_eau(self):
         # ETANT DONNE une machine à café avec un brewer défaillant
@@ -122,9 +120,9 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS la LED d'avertissement s'allume
-        self.assertTrue(button_panel.get_lungo_warning_state()) # False par défaut car la LED n'est pas encore rouge
+        self.assertLedWarning(button_panel, True)    
         # ET 50cts ont été débités 
-        self.assertEqual(-50, carte._somme_operations)
+        self.assertCarteDebitee(carte, -50)
 
     def test_led_machine_defaillante(self):
         # ETANT DONNE une machine à café avec un brewer défaillant
@@ -144,10 +142,10 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS la LED d'avertissement s'allume
-        self.assertTrue(button_panel.get_lungo_warning_state()) # False par défaut car la LED n'est pas encore rouge    
+        self.assertLedWarning(button_panel, True)    
         # ET la carte n'a pas été débitée
-        self.assertEqual(0, carte._somme_operations)
-    
+        self.assertCarteDebitee(carte, 0)
+
     def test_nominal_lungo(self):
         # ETANT DONNE une machine à café normale
         brewer_fake = BrewerFake() 
@@ -166,11 +164,11 @@ class MyTestCase(unittest.TestCase):
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
         # ALORS la LED d'avertissement ne s'allume pas
-        self.assertFalse(button_panel.get_lungo_warning_state()) # False par défaut car la LED n'est pas encore rouge    
+        self.assertLedWarning(button_panel, False)    
         # ET la carte a été débitée
-        self.assertEqual(-50, carte._somme_operations)  
-
+        self.assertCarteDebitee(carte, -50)
 
 
 if __name__ == '__main__':
     unittest.main()
+

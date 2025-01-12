@@ -34,3 +34,7 @@ class BrewerFake(BrewerInterface):
             self._make_a_coffee_appele = True
             return True
         return False
+    
+    def make_a_coffee_appele(self) -> bool:
+        return self._make_a_coffee_appele
+    

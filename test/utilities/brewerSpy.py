@@ -26,6 +26,8 @@ class BrewerSpy(BrewerInterface):
 
     def make_a_coffee(self) -> bool:
         self._make_a_coffee_appele = True
-
-    def make_a_coffee_appele(self):
         return self._make_a_coffee_appele
+
+    def make_a_coffee_appele(self) -> bool:
+        return self._make_a_coffee_appele
+   
