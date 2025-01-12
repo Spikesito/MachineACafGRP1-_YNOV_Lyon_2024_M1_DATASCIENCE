@@ -4,21 +4,23 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.hardware.brewer import BrewerInterface
-
 class BrewerFake(BrewerInterface):
-    def __init__(self, is_defaillant=False, no_water = False, no_more_water=False):
+    def __init__(self, is_defaillant=False, no_water=False, no_more_water=False):
         self._is_defaillant = is_defaillant
         self._no_more_water = no_more_water
         self._no_water = no_water
         self._make_a_coffee_appele = False
         self._quantity_sugar = 0
 
-    def pour_sugar(self,quantity : int) -> bool:
-        if  0 <= quantity <= 5:
+    def pour_sugar(self, quantity: int) -> bool:
+        if 0 <= quantity <= 5:
             self._quantity_sugar = quantity
-            return True 
+            return True
         return False
-    
+
+    def reset_sugar(self) -> None:
+        self._quantity_sugar = 0  
+
     def get_sugar_quantity(self) -> int:
         return self._quantity_sugar
 
@@ -41,7 +43,6 @@ class BrewerFake(BrewerInterface):
             self._make_a_coffee_appele = True
             return True
         return False
-    
+
     def make_a_coffee_appele(self) -> bool:
         return self._make_a_coffee_appele
-    

@@ -22,31 +22,36 @@ class MachineACafe:
         carte_debitee = card_handle.try_charge_amount(50)
         if not carte_debitee:
             return
-        
+
+        # Réinitialiser la quantité de sucre et la touillette avant la préparation
+        self._brewer.reset_sugar()
+        self._cup_provider.reset_stirrer()
+
+        # Préparer le café
         make_a_coffee_appele = self._brewer.make_a_coffee()
         if not make_a_coffee_appele:
             self._button_panel.set_lungo_warning_state(True)
             card_handle.refund(50)
             return
-        # Si le café est un lungo, ajouter de l'eau
+
+        # Si c'est un Lungo, ajouter de l'eau
         if self._last_button_pressed == ButtonCode.BTN_LUNGO:
             if self._brewer.try_pull_water():
                 self._brewer.pour_water()
             else:
                 self._button_panel.set_lungo_warning_state(True)
 
-        # Ajout de sucre et donner la touillette
+        # Gestion du sucre et de la touillette
         if self.sugar_quantity > 0:
             self._brewer.pour_sugar(self.sugar_quantity)
             self._cup_provider.provide_stirrer()
 
-        
+        # Réinitialiser le sucre après préparation du café
+        self.sugar_quantity = 0
 
-
-           
     def _button_pressed_callback(self, button: ButtonCode):
         if button == ButtonCode.BTN_SUGAR_PLUS:
             self.sugar_quantity += 1
         elif button == ButtonCode.BTN_SUGAR_MINUS:
-            self.sugar_quantity -= 1
-        self._last_button_pressed = button    
+            self.sugar_quantity = max(0, self.sugar_quantity - 1)
+        self._last_button_pressed = button

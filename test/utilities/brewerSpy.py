@@ -15,6 +15,10 @@ class BrewerSpy(BrewerInterface):
             self._quantity_sugar = quantity
             return True 
         return False
+
+    def reset_sugar(self) -> None:
+        self._quantity_sugar = 0 
+
     def get_sugar_quantity(self) -> int:
         return self._quantity_sugar
 

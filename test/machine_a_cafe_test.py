@@ -192,5 +192,118 @@ class MyTestCase(machine_a_cafe_matcher):
         # ET 50cts ont été débités 
         self.assertCarteDebitee(carte, -50)
 
+    def test_cafe_sans_sucre_pas_de_touillette(self):
+        # ETANT DONNE une machine à café
+        lecteur_cb_fake = LecteurCBFake()
+        brewer_fake = BrewerFake()
+        button_panel_fake = ButtonPanelFake()
+        cup_provider_fake = CupProviderFake()
+        
+        machine_a_cafe = (MachineACafeBuilder()
+                        .ayant_pour_brewer(brewer_fake)
+                        .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                        .ayant_pour_button_panel(button_panel_fake)
+                        .ayant_pour_cup_provider(cup_provider_fake)
+                        .build())
+
+        # QUAND une CB est détectée (sans appuyer sur le bouton sucre)
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        # ALORS aucun sucre ne doit être ajouté
+        self.assertCafeCommande(brewer_fake, True)
+        # ET aucune touillette ne doit être fournie
+        self.assertFalse(cup_provider_fake.is_stirrer_provided())
+        # ET la carte a été débitée
+        self.assertCarteDebitee(carte, -50)
+
+    def test_ajout_sucre(self):
+        lecteur_cb_fake = LecteurCBFake()
+        brewer_spy = BrewerSpy()
+        button_panel_fake = ButtonPanelFake()
+        cup_provider_fake = CupProviderFake()
+
+        machine_a_cafe = (MachineACafeBuilder()
+                          .ayant_pour_brewer(brewer_spy)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel_fake)
+                          .ayant_pour_cup_provider(cup_provider_fake)
+                          .build())
+
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        self.assertEqual(brewer_spy.get_sugar_quantity(), 2)
+        self.assertTrue(cup_provider_fake.is_stirrer_provided())
+
+    def test_reduction_sucre(self):
+        lecteur_cb_fake = LecteurCBFake()
+        brewer_spy = BrewerSpy()
+        button_panel_fake = ButtonPanelFake()
+        cup_provider_fake = CupProviderFake()
+
+        machine_a_cafe = (MachineACafeBuilder()
+                          .ayant_pour_brewer(brewer_spy)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel_fake)
+                          .ayant_pour_cup_provider(cup_provider_fake)
+                          .build())
+
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_MINUS)
+
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        self.assertEqual(brewer_spy.get_sugar_quantity(), 1)
+        self.assertTrue(cup_provider_fake.is_stirrer_provided())
+
+    def test_sucre_cycle_reinitialisation(self):
+        # ETANT DONNE une machine à café
+        lecteur_cb_fake = LecteurCBFake()
+        brewer_fake = BrewerFake()
+        button_panel_fake = ButtonPanelFake()
+        cup_provider_fake = CupProviderFake()
+        
+        machine_a_cafe = (MachineACafeBuilder()
+                        .ayant_pour_brewer(brewer_fake)
+                        .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                        .ayant_pour_button_panel(button_panel_fake)
+                        .ayant_pour_cup_provider(cup_provider_fake)
+                        .build())
+
+        # QUAND le bouton sucre est pressé 2 fois
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        
+        # ET une CB est détectée pour un premier café
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        # ALORS le café doit être préparé
+        self.assertCafeCommande(brewer_fake, True)
+        # ET une touillette doit être fournie car il y a du sucre
+        self.assertTrue(cup_provider_fake.is_stirrer_provided())
+        
+        
+        # QUAND une nouvelle CB est détectée sans appuyer sur le bouton sucre
+        carte2 = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte2)
+
+
+
+        # ALORS le café doit être préparé
+        self.assertCafeCommande(brewer_fake, True)
+        self.assertEqual(brewer_fake.get_sugar_quantity(), 0)
+        # ET aucune touillette ne doit être fournie car pas de sucre
+        self.assertFalse(cup_provider_fake.is_stirrer_provided())
+
+        
+
+
 if __name__ == '__main__':
     unittest.main()

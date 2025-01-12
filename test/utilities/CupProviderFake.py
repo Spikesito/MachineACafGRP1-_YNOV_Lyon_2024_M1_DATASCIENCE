@@ -20,14 +20,19 @@ class CupProviderFake(CupProviderInterface):
         pass
 
     def provide_stirrer(self) -> None:
-        # Simuler la remise de la touillette
         self._stirrer_provided = True
 
     def is_stirrer_provided(self) -> bool:
-        if self._stirrer_present:
+    
+        if self._stirrer_present :
             return self._stirrer_provided
         return False
     
+    
+    
     def is_stirrer_present(self) -> bool:
         return self._stirrer_present
+    
+    def reset_stirrer(self) -> None:
+        self._stirrer_provided = False  
 
