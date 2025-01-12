@@ -30,10 +30,10 @@ class MyTestCase(machine_a_cafe_matcher):
         # ET 50cts ont été débités
         self.assertCarteDebitee(carte, -50)
 
-    def test_defaillant(self):
-        # ETANT DONNE une machine à café manquant de café
-        lecteur_cb_fake = LecteurCBFake()
+    def test_machine_defaillante(self):
+        # ETANT DONNE une machine à café avec un brewer défaillant
         brewer_fake = BrewerFake(is_defaillant=True)
+        lecteur_cb_fake = LecteurCBFake()
         button_panel = ButtonPanelFake()
         machine_a_cafe = (MachineACafeBuilder()
                           .ayant_pour_brewer(brewer_fake)
@@ -41,16 +41,101 @@ class MyTestCase(machine_a_cafe_matcher):
                           .ayant_pour_button_panel(button_panel)
                           .build())
 
-        # QUAND une CB est détectée
+        # QUAND le bouton BTN_LUNGO est pressé
+        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO)
+        # ET une CB est détectée
         carte = CarteFake.default()
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
-        # ALORS aucun café n'est demandé au hardware
+        # ALORS la LED d'avertissement s'allume
+        self.assertLedWarning(button_panel, True)    
+        # ET aucun café n'est demandé au hardware
         self.assertCafeCommande(brewer_fake, False)
         # ET la carte n'a pas été débitée
         self.assertCarteDebitee(carte, 0)
-        # ET la LED d'avertissement s'allume
-        self.assertLedWarning(button_panel, True)
+
+    def test_manque_deau_et_led(self):
+        # ETANT DONNE une machine à café manquant d'eau
+        lecteur_cb_fake = LecteurCBFake()
+        brewer_fake = BrewerFake(no_water=True)  # Simule le manque d'eau
+        button_panel = ButtonPanelFake()
+        machine_a_cafe = (MachineACafeBuilder()
+                          .ayant_pour_brewer(brewer_fake)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel)
+                          .build())
+
+        # QUAND le bouton BTN_LUNGO est pressé
+        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO)
+        # ET une CB est détectée
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        # ALORS la LED d'avertissement s'allume
+        self.assertLedWarning(button_panel, True)    
+        # ET aucun café n'est demandé au hardware
+        self.assertCafeCommande(brewer_fake, False)
+        # ET aucune somme n'a été débitée
+        self.assertCarteDebitee(carte, 0)
+
+    def test_nominal_lungo(self):
+        # ETANT DONNE une machine à café normale
+        brewer_fake = BrewerFake() 
+        lecteur_cb_fake = LecteurCBFake()
+        button_panel = ButtonPanelFake()
+        machine_a_cafe = (MachineACafeBuilder()
+                          .ayant_pour_brewer(brewer_fake)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel)
+                          .build())
+
+        # QUAND le bouton BTN_LUNGO est pressé
+        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO)
+        # ET une CB est détectée
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        # ALORS la LED d'avertissement ne s'allume pas pour un café "Lungo"
+        self.assertLedWarning(button_panel, False)    
+        # ET la carte a été débitée
+        self.assertCarteDebitee(carte, -50)
+
+    def test_lungo_avec_sucre_et_touillette(self):
+        # ETANT DONNE une machine à café avec des touillettes disponibles
+        lecteur_cb_fake = LecteurCBFake()
+        brewer_spy = BrewerSpy()
+        button_panel_fake = ButtonPanelFake()
+        cup_provider_fake = CupProviderFake()
+
+        machine_a_cafe = (MachineACafeBuilder()
+                          .ayant_pour_brewer(brewer_spy)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel_fake)
+                          .ayant_pour_cup_provider(cup_provider_fake)
+                          .build())
+
+        # QUAND le bouton BTN_LUNGO est pressé
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_LUNGO)
+
+        # ET le bouton BTN_SUGAR_PLUS est pressé 3 fois
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+
+        # ET que la machine est prête à faire un café
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        # ALORS la quantité de sucre doit être de 3
+        self.assertEqual(brewer_spy.get_sugar_quantity(), 3)
+
+        # ET une touillette doit avoir été fournie
+        self.assertTrue(cup_provider_fake.is_stirrer_provided())
+
+        # ALORS la LED d'avertissement ne s'allume pas
+        self.assertLedWarning(button_panel_fake, False)
+        # ET la carte a été débitée
+        self.assertCarteDebitee(carte, -50)
 
     def test_cb_manque_provision(self):
         # ETANT DONNE une machine à café
@@ -72,24 +157,6 @@ class MyTestCase(machine_a_cafe_matcher):
         # ET la carte n'a pas été débitée
         self.assertCarteDebitee(carte, 0)
 
-    def test_manque_deau(self):
-        # ETANT DONNE une machine à café manquant d'eau
-        lecteur_cb_fake = LecteurCBFake()
-        brewer_fake = BrewerFake(no_water=True)
-        machine_a_cafe = (MachineACafeBuilder()
-                          .ayant_pour_brewer(brewer_fake)
-                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
-                          .build())
-        
-        # QUAND une CB est détectée
-        carte = CarteFake.default()
-        lecteur_cb_fake.simuler_cb_detectee(carte)
-
-        # ALORS aucun café n'est demandé au hardware
-        self.assertCafeCommande(brewer_fake, False)
-        # ET aucune somme n'a été débitée
-        self.assertCarteDebitee(carte, 0)
-
     def test_pas_de_cb(self):
         # ETANT DONNE une machine à café
         lecteur_cb_fake = LecteurCBFake()
@@ -98,7 +165,7 @@ class MyTestCase(machine_a_cafe_matcher):
                           .ayant_pour_brewer(brewer_spy)
                           .ayant_pour_lecteur_cb(lecteur_cb_fake)
                           .build())
-        
+
         # QUAND aucune CB n'est détectée
         # ALORS aucun café n'est demandé au hardware
         self.assertCafeCommande(brewer_spy, False)
@@ -115,7 +182,7 @@ class MyTestCase(machine_a_cafe_matcher):
                           .build())
 
         # QUAND le bouton BTN_LUNGO est pressé
-        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO) # 0 est le code du café allongé
+        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO)
         # ET une CB est détectée
         carte = CarteFake.default()
         lecteur_cb_fake.simuler_cb_detectee(carte)
@@ -125,81 +192,5 @@ class MyTestCase(machine_a_cafe_matcher):
         # ET 50cts ont été débités 
         self.assertCarteDebitee(carte, -50)
 
-    def test_led_machine_defaillante(self):
-        # ETANT DONNE une machine à café avec un brewer défaillant
-        brewer_fake = BrewerFake(is_defaillant=True)  # Simule problème cafe
-        lecteur_cb_fake = LecteurCBFake()
-        button_panel = ButtonPanelFake()
-        machine_a_cafe = (MachineACafeBuilder()
-                          .ayant_pour_brewer(brewer_fake)
-                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
-                          .ayant_pour_button_panel(button_panel)
-                          .build())
-
-        # QUAND le bouton BTN_LUNGO est pressé
-        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO) # 0 est le code du café allongé
-        # ET une CB est détectée
-        carte = CarteFake.default()
-        lecteur_cb_fake.simuler_cb_detectee(carte)
-
-        # ALORS la LED d'avertissement s'allume
-        self.assertLedWarning(button_panel, True)    
-        # ET la carte n'a pas été débitée
-        self.assertCarteDebitee(carte, 0)
-
-    def test_nominal_lungo(self):
-        # ETANT DONNE une machine à café normale
-        brewer_fake = BrewerFake() 
-        lecteur_cb_fake = LecteurCBFake()
-        button_panel = ButtonPanelFake()
-        machine_a_cafe = (MachineACafeBuilder()
-                          .ayant_pour_brewer(brewer_fake)
-                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
-                          .ayant_pour_button_panel(button_panel)
-                          .build())
-
-        # QUAND le bouton BTN_LUNGO est pressé
-        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO) # 0 est le code du café allongé
-        # ET une CB est détectée
-        carte = CarteFake.default()
-        lecteur_cb_fake.simuler_cb_detectee(carte)
-
-        # ALORS la LED d'avertissement ne s'allume pas
-        self.assertLedWarning(button_panel, False)    
-        # ET la carte a été débitée
-        self.assertCarteDebitee(carte, -50)
-
-    def test_ajout_sucre_et_touillette(self):
-        # ETANT DONNE une machine à café avec des touillettes disponibles
-        lecteur_cb_fake = LecteurCBFake()
-        brewer_spy = BrewerSpy()
-        button_panel_fake = ButtonPanelFake()
-        cup_provider_fake = CupProviderFake()
-        
-        machine_a_cafe = (MachineACafeBuilder()
-                          .ayant_pour_brewer(brewer_spy)
-                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
-                          .ayant_pour_button_panel(button_panel_fake)
-                          .ayant_pour_cup_provider(cup_provider_fake)
-                          .build())
-        
-        # QUAND le bouton BTN_SUGAR_PLUS est pressé 3 fois
-        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
-        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
-        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
-
-        # ET que la machine est prête à faire un café
-        carte = CarteFake.default()
-        lecteur_cb_fake.simuler_cb_detectee(carte)
-
-        # ALORS la quantité de sucre doit être de 3
-        self.assertEqual(brewer_spy.get_sugar_quantity(), 3)
-
-        # ET une touillette doit avoir été fournie
-        self.assertTrue(cup_provider_fake.is_stirrer_provided())
-
-        
-
 if __name__ == '__main__':
     unittest.main()
-
