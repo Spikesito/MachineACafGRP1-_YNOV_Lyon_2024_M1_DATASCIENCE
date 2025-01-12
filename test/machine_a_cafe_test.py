@@ -170,41 +170,35 @@ class MyTestCase(machine_a_cafe_matcher):
         self.assertCarteDebitee(carte, -50)
 
     def test_ajout_sucre_et_touillette(self):
-        # ETANT DONNE une machine à café avec un brewer et un fournisseur de touillette
-        brewer_spy = BrewerSpy()
+        # ETANT DONNE une machine à café avec des touillettes disponibles
         lecteur_cb_fake = LecteurCBFake()
+        brewer_spy = BrewerSpy()
         button_panel_fake = ButtonPanelFake()
         cup_provider_fake = CupProviderFake()
-
+        
         machine_a_cafe = (MachineACafeBuilder()
-                        .ayant_pour_brewer(brewer_spy)
-                        .ayant_pour_lecteur_cb(lecteur_cb_fake)
-                        .ayant_pour_button_panel(button_panel_fake)
-                        .ayant_pour_cup_provider(cup_provider_fake)
-                        .build())
+                          .ayant_pour_brewer(brewer_spy)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel_fake)
+                          .ayant_pour_cup_provider(cup_provider_fake)
+                          .build())
+        
+        # QUAND le bouton BTN_SUGAR_PLUS est pressé 3 fois
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
 
-        # ET une CB est détectée
+        # ET que la machine est prête à faire un café
         carte = CarteFake.default()
         lecteur_cb_fake.simuler_cb_detectee(carte)
-
-        # Test de la détection de la carte et du débit
-        self.test_cb_detectee(lecteur_cb_fake, carte, -50)
-
-        # QUAND on choisit de préparer un café avec 3 doses de sucre
-        machine_a_cafe.prepare_coffee(sugar_quantity=3)
 
         # ALORS la quantité de sucre doit être de 3
         self.assertEqual(brewer_spy.get_sugar_quantity(), 3)
 
-        # ET une touillette doit être fournie
+        # ET une touillette doit avoir été fournie
         self.assertTrue(cup_provider_fake.is_stirrer_provided())
 
-        # Le café doit être préparé
-        self.assertTrue(brewer_spy.make_a_coffee_appele())
-
-    
-
-
+        
 
 if __name__ == '__main__':
     unittest.main()

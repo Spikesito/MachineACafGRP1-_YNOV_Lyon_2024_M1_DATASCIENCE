@@ -15,6 +15,8 @@ class BrewerSpy(BrewerInterface):
             self._quantity_sugar = quantity
             return True 
         return False
+    def get_sugar_quantity(self) -> int:
+        return self._quantity_sugar
 
     def pour_chocolate(self) -> bool:
         pass
