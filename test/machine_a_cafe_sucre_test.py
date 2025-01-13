@@ -33,7 +33,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
 
         # ALORS un café est commandé sans sucre
         self.assertCafeCommande(brewer_fake, True)
-        self.assertEqual(brewer_fake.get_sugar_quantity(), 0)
+        self.assertSansSucre(brewer_fake)
         # ET aucune touillette ne doit être fournie
         self.assertStirrerProvided(cup_provider_fake, False)
         # ET la carte a été débitée
@@ -60,11 +60,11 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         carte = CarteFake.default()
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
-        # Vérifie que la quantité de sucre est de 1
-        self.assertEqual(brewer_spy.get_sugar_quantity(), 1)
-        # La touillette est fournie
+        # vérifie que la quantité de sucre est bien délivrée
+        self.assertPourSugar(brewer_spy, reussite=True)
+        # la touillette est fournie
         self.assertStirrerProvided(cup_provider_fake, True)
-        # Vérifie le débit de la carte
+        # vérifie le débit de la carte
         self.assertCarteDebitee(carte, -50)
 
     def test_reduction_sucre(self):
@@ -88,10 +88,10 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         carte = CarteFake.default()
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
-        #  ALORS un café est commandé au hardware
+        # ALORS un café est commandé au hardware
         self.assertCafeCommande(brewer_spy, True)
-        # ET  un sucre ne doit être ajouté
-        self.assertEqual(brewer_spy.get_sugar_quantity(), 1)
+        # ET vérifie que la quantité de sucre est bien délivrée
+        self.assertPourSugar(brewer_spy, True)
         # ET une touillette doit être fournie
         self.assertStirrerProvided(cup_provider_fake, True)
 
@@ -119,8 +119,8 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
 
         # ALORS un café est commandé au hardware
         self.assertCafeCommande(brewer_fake, True)
-        # ET deux sucres doivent être ajoutés	
-        self.assertEqual(brewer_fake.get_sugar_quantity(), 2)
+        # ET vérifie que la quantité de sucre est bien délivrée	
+        self.assertPourSugar(brewer_fake, True)
         # ET une touillette doit être fournie
         self.assertStirrerProvided(cup_provider_fake, True)
         # ET 50cts ont été débités
@@ -134,8 +134,8 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
 
         # ALORS un café est commandé au hardware	
         self.assertCafeCommande(brewer_fake, True)
-        # ET aucun sucre ne doit être ajouté
-        self.assertEqual(brewer_fake.get_sugar_quantity(), 0)
+        # ET vérifie que aucun sucre n'est délivrée
+        self.assertSansSucre(brewer_fake)
         # ET aucune touillette ne doit être fournie
         self.assertStirrerProvided(cup_provider_fake, False)
         # ET 50cts ont été débités
@@ -154,7 +154,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
                           .ayant_pour_button_panel(button_panel_fake)
                           .ayant_pour_cup_provider(cup_provider_fake)
                           .build())
-        # retirer 2 sucres pour voir le sucre reste à 0
+        # retirer 2 sucres à une quantité initial de 0 sucre
         button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_MINUS)
         button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_MINUS)
 
@@ -166,7 +166,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         self.assertCafeCommande(brewer_spy, True)
 
         # ET aucun sucre ne doit être ajouté
-        self.assertEqual(brewer_spy.get_sugar_quantity(), 0)
+        self.assertSansSucre(brewer_spy)
         # ET aucune touillette ne doit être fournie
         self.assertStirrerProvided(cup_provider_fake, False)
 

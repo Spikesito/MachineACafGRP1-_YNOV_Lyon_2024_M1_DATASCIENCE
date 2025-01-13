@@ -50,3 +50,20 @@ class machine_a_cafe_matcher(unittest.TestCase):
             attendu, cup_provider.provide_stirrer_appele(),
             f"Présence de touillette incorrecte. Attendu: {attendu}, Trouvé: {cup_provider.provide_stirrer_appele()}"
         )
+
+    def assertPourSugar(self, brewer, reussite=False, echec=False):
+        self.assertEqual(
+            reussite, all(brewer.pour_sugar_appele()),
+            f"Quantité de sucre incorrecte. Attendu: {reussite}, Trouvé: {brewer.pour_sugar_appele()}"
+        )
+
+        self.assertEqual(
+            echec, not all(brewer.pour_sugar_appele()),
+            f"Quantité de sucre incorrecte. Attendu: {not echec}, Trouvé: {brewer.pour_sugar_appele()}"
+        )
+    
+    def assertSansSucre(self, brewer):
+        self.assertEqual(
+            0, len(brewer.pour_sugar_appele()),
+            f"Quantité de sucre incorrecte. Attendu: 0, Trouvé: {brewer.pour_sugar_appele()}"
+        )
