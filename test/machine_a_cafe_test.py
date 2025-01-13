@@ -153,8 +153,42 @@ class MyTestCase(machine_a_cafe_matcher):
         self.assertLedWarning(button_panel, True)    
         # ET 50cts ont été débités 
         self.assertCarteDebitee(carte, -50)
+
+    def test_couler_cafe_long_et_plus_d_eau_pour_expresso(self):
+        # ETANT DONNE une machine à café avec de l'eau initialement
+        lecteur_cb_fake = LecteurCBFake()
+        brewer_fake = BrewerFake()
+        button_panel = ButtonPanelFake()
+        machine_a_cafe = (MachineACafeBuilder()
+                        .ayant_pour_brewer(brewer_fake)
+                        .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                        .ayant_pour_button_panel(button_panel)
+                        .build())
+
+        # QUAND le bouton BTN_LUNGO est pressé
+        button_panel.simuler_button_pressed(ButtonCode.BTN_LUNGO)
+        # ET une CB est détectée
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        # ALORS un café est commandé au hardware
+        self.assertCafeCommande(brewer_fake, True)
+        # ET 50cts ont été débités
+        self.assertCarteDebitee(carte, -50)
+
+        # ET la machine est maintenant à court d'eau
+        brewer_fake._no_water = True 
+
+        # QUAND une carte est détectée 
+        carte2 = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte2)
+
+        # ALORS aucun café ne doit être préparé
+        self.assertCafeCommande(brewer_fake, False)
+        # ET la LED d'avertissement s'allume
+        self.assertLedWarning(button_panel, True)
+        # ET la carte n'est pas débitée
+        self.assertCarteDebitee(carte2, 0)
         
-
-
 if __name__ == '__main__':
     unittest.main()
