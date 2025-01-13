@@ -7,7 +7,7 @@ from utilities.carteFake import CarteFake
 from utilities.buttonPanelFake import ButtonPanelFake
 from src.hardware.buttonpanel import ButtonCode
 from utilities.machine_a_cafe import MachineACafeBuilder
-from test.machine_a_cafe_matcher import machine_a_cafe_matcher
+from machine_a_cafe_matcher import machine_a_cafe_matcher
 from utilities.CupProviderFake import CupProviderFake
 
 class MyTestCase(machine_a_cafe_matcher):

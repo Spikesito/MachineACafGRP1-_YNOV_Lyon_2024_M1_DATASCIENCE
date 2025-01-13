@@ -7,13 +7,13 @@ from utilities.carteFake import CarteFake
 from utilities.buttonPanelFake import ButtonPanelFake
 from src.hardware.buttonpanel import ButtonCode
 from utilities.machine_a_cafe import MachineACafeBuilder
-from test.machine_a_cafe_matcher import machine_a_cafe_matcher
+from machine_a_cafe_matcher import machine_a_cafe_matcher
 from utilities.CupProviderFake import CupProviderFake
 
 
 class MyTestCaseSucre(machine_a_cafe_matcher):
 
-    def test_cafe_sans_sucre_pas_de_touillette(self):
+    def test_cafe_commandé_sans_touillette(self):
         # ETANT DONNE une machine à café
         lecteur_cb_fake = LecteurCBFake()
         brewer_fake = BrewerFake()
@@ -27,11 +27,11 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
                         .ayant_pour_cup_provider(cup_provider_fake)
                         .build())
 
-        # QUAND une CB est détectée pour un café sans sucre
+        # QUAND une CB est détectée
         carte = CarteFake.default()
         lecteur_cb_fake.simuler_cb_detectee(carte)
 
-        # ALORS aucun sucre ne doit être ajouté
+        # ALORS un café est commandé sans sucre
         self.assertCafeCommande(brewer_fake, True)
         self.assertEqual(brewer_fake.get_sugar_quantity(), 0)
         # ET aucune touillette ne doit être fournie
