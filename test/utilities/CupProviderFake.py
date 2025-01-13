@@ -7,8 +7,7 @@ from src.hardware.cupprovider import CupProviderInterface
 
 class CupProviderFake(CupProviderInterface):
     def __init__(self):
-        self._stirrer_provided = False   #  touillette a été fournie
-        self._stirrer_present = True # stock de touillettes
+        self._provide_stirrer_appele = False   
 
     def provide_cup(self) -> None:
         pass
@@ -19,20 +18,13 @@ class CupProviderFake(CupProviderInterface):
     def is_cup_present(self):
         pass
 
-    def provide_stirrer(self) -> None:
-        self._stirrer_provided = True
+    def provide_stirrer(self) -> bool:
+        self._provide_stirrer_appele = True
+        return self._provide_stirrer_appele
 
-    def is_stirrer_provided(self) -> bool:
-    
-        if self._stirrer_present :
-            return self._stirrer_provided
-        return False
-    
-    
-    
-    def is_stirrer_present(self) -> bool:
-        return self._stirrer_present
+    def provide_stirrer_appele(self) -> bool:
+        return self._provide_stirrer_appele
     
     def reset_stirrer(self) -> None:
-        self._stirrer_provided = False  
+        self._provide_stirrer_appele = False  
 

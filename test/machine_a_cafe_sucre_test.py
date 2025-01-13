@@ -35,7 +35,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         self.assertCafeCommande(brewer_fake, True)
         self.assertEqual(brewer_fake.get_sugar_quantity(), 0)
         # ET aucune touillette ne doit être fournie
-        self.assertFalse(cup_provider_fake.is_stirrer_provided())
+        self.assertStirrerProvided(cup_provider_fake, False)
         # ET la carte a été débitée
         self.assertCarteDebitee(carte, -50)
 
@@ -63,7 +63,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         # Vérifie que la quantité de sucre est de 1
         self.assertEqual(brewer_spy.get_sugar_quantity(), 1)
         # La touillette est fournie
-        self.assertTrue(cup_provider_fake.is_stirrer_provided())
+        self.assertStirrerProvided(cup_provider_fake, True)
         # Vérifie le débit de la carte
         self.assertCarteDebitee(carte, -50)
 
@@ -93,7 +93,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         # ET  un sucre ne doit être ajouté
         self.assertEqual(brewer_spy.get_sugar_quantity(), 1)
         # ET une touillette doit être fournie
-        self.assertTrue(cup_provider_fake.is_stirrer_provided())
+        self.assertStirrerProvided(cup_provider_fake, True)
 
     def test_sucre_cycle_reinitialisation(self):
         # ETANT DONNE une machine à café
@@ -122,7 +122,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         # ET deux sucres doivent être ajoutés	
         self.assertEqual(brewer_fake.get_sugar_quantity(), 2)
         # ET une touillette doit être fournie
-        self.assertTrue(cup_provider_fake.is_stirrer_provided())
+        self.assertStirrerProvided(cup_provider_fake, True)
         # ET 50cts ont été débités
         self.assertCarteDebitee(carte, -50)
         
@@ -137,7 +137,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         # ET aucun sucre ne doit être ajouté
         self.assertEqual(brewer_fake.get_sugar_quantity(), 0)
         # ET aucune touillette ne doit être fournie
-        self.assertFalse(cup_provider_fake.is_stirrer_provided())
+        self.assertStirrerProvided(cup_provider_fake, False)
         # ET 50cts ont été débités
         self.assertCarteDebitee(carte, -50)
 
@@ -168,7 +168,7 @@ class MyTestCaseSucre(machine_a_cafe_matcher):
         # ET aucun sucre ne doit être ajouté
         self.assertEqual(brewer_spy.get_sugar_quantity(), 0)
         # ET aucune touillette ne doit être fournie
-        self.assertFalse(cup_provider_fake.is_stirrer_provided())
+        self.assertStirrerProvided(cup_provider_fake, False)
 
         # Vérifie le débit de la carte
         self.assertCarteDebitee(carte, -50)

@@ -44,3 +44,9 @@ class machine_a_cafe_matcher(unittest.TestCase):
             is_defaillant, brewer.is_defaillant,
             f"Problème de défaillance du hardware incorrect. Attendu: {is_defaillant}, Trouvé: {brewer.is_defaillant}"
         )
+
+    def assertStirrerProvided(self, cup_provider, attendu):
+        self.assertEqual(
+            attendu, cup_provider.provide_stirrer_appele(),
+            f"Présence de touillette incorrecte. Attendu: {attendu}, Trouvé: {cup_provider.provide_stirrer_appele()}"
+        )

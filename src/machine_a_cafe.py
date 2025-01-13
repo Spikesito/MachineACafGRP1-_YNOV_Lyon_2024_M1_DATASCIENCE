@@ -69,7 +69,7 @@ class MachineACafe:
     # Callback lors de l’appui sur un bouton, gère l’ajout ou la suppression de sucre
     def _button_pressed_callback(self, button: ButtonCode):
         if button == ButtonCode.BTN_SUGAR_PLUS:
-            self.sugar_quantity += 1
+            self.sugar_quantity = min(5, self.sugar_quantity + 1)
         elif button == ButtonCode.BTN_SUGAR_MINUS:
             self.sugar_quantity = max(0, self.sugar_quantity - 1)
         self._last_button_pressed = button
