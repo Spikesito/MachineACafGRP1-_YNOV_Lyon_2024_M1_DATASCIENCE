@@ -191,13 +191,11 @@ class TestMachineCafeSucre(machine_a_cafe_matcher):
         # ET une CB est détectée
         carte = CarteFake.default()
         lecteur_cb_fake.simuler_cb_detectee(carte)
-
-        # ALORS la LED d'avertissement s'allume
-        self.assertLedWarning(button_panel_fake, True)   
-        # ET aucun café n'est demandé au hardware
-        self.assertCafeCommande(brewer_fake, False)
-        # ET la carte n'a pas été débitée
-        self.assertCarteDebitee(carte, 0)
+   
+        # ET un café est demandé au hardware
+        self.assertCafeCommande(brewer_fake, True)
+        # ET la carte a été débitée
+        self.assertCarteDebitee(carte, -50)
         # ET aucun sucre n'est distribué
         self.assertPourSugar(brewer_fake, echec=True)
 

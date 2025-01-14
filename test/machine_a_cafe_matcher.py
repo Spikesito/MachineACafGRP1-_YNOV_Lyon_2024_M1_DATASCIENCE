@@ -43,14 +43,15 @@ class machine_a_cafe_matcher(unittest.TestCase):
         )
 
     def assertPourSugar(self, brewer, reussite=False, echec=False):
+        pour_sugar_status = brewer.pour_sugar_appele()
         self.assertEqual(
-            reussite, all(brewer.pour_sugar_appele()),
-            f"Quantité de sucre incorrecte. Attendu: {reussite}, Trouvé: {brewer.pour_sugar_appele()}"
+            reussite, all(pour_sugar_status),
+            f"Quantité de sucre incorrecte. Attendu: {reussite}, Trouvé: {pour_sugar_status}"
         )
 
         self.assertEqual(
-            echec, not all(brewer.pour_sugar_appele()),
-            f"Quantité de sucre incorrecte. Attendu: {not echec}, Trouvé: {brewer.pour_sugar_appele()}"
+            echec, not all(pour_sugar_status),
+            f"Quantité de sucre incorrecte. Attendu: {not echec}, Trouvé: {pour_sugar_status}"
         )
     
     def assertSansSucre(self, brewer):
