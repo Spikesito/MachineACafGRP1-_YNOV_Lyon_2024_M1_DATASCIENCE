@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.hardware.brewer import BrewerInterface
 
-class BrewerDefaillantFake(BrewerInterface):
+class BrewerdefaulterFake(BrewerInterface):
     def pour_sugar(self) -> bool:
         pass
 

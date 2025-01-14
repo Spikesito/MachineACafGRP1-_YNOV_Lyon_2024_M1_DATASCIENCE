@@ -7,11 +7,11 @@ from src.hardware.brewer import BrewerInterface
 
 class BrewerSpy(BrewerInterface):
     def __init__(self):
-        self._make_a_coffee_appele = False
-        self.pour_sugra_appele = []
+        self._make_a_coffee_called = False
+        self.pour_sugar_called = []
 
     def pour_sugar(self) -> bool:
-        self.pour_sugra_appele.append(True)
+        self.pour_sugar_called.append(True)
         return True 
     
     def pour_chocolate(self) -> bool:
@@ -27,17 +27,15 @@ class BrewerSpy(BrewerInterface):
         pass
 
     def make_a_coffee(self) -> bool:
-        self._make_a_coffee_appele = True
-        return self._make_a_coffee_appele
+        self._make_a_coffee_called = True
+        return self._make_a_coffee_called
 
-    def make_a_coffee_appele(self) -> bool:
-        _make_a_coffee_status = self._make_a_coffee_appele
-        self._make_a_coffee_appele = False
-        return _make_a_coffee_status
+    def was_make_a_coffee_called(self) -> bool:
+        make_a_coffee_status = self._make_a_coffee_called
+        self._make_a_coffee_called = False
+        return make_a_coffee_status
     
-    def pour_sugar_appele(self) -> bool:
-        pour_sugar_status = self.pour_sugra_appele
-        self.pour_sugra_appele = []
+    def get_pour_sugar_calls(self) -> list:
+        pour_sugar_status = self.pour_sugar_called.copy()
+        self.pour_sugar_called = []
         return pour_sugar_status
-    
-   
