@@ -153,6 +153,7 @@ class TestMachineCafeSucre(machine_a_cafe_matcher):
                             .ayant_pour_button_panel(button_panel_fake)
                             .ayant_pour_cup_provider(cup_provider_fake)
                             .build())
+        
         # retirer 2 sucres à une quantité initial de 0 sucre
         button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_MINUS)
         button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_MINUS)
@@ -171,6 +172,34 @@ class TestMachineCafeSucre(machine_a_cafe_matcher):
 
         # Vérifie le débit de la carte
         self.assertCarteDebitee(carte, -50)
+    
+    def test_machine_defaillante_et_sucre_non_distribué(self):
+        # ETANT DONNE une machine à café avec un brewer défaillant
+        brewer_fake = BrewerFake(no_sugar=True)
+        lecteur_cb_fake = LecteurCBFake()
+        button_panel_fake = ButtonPanelFake()
+
+        machine_a_cafe = (MachineACafeBuilder()
+                          .ayant_pour_brewer(brewer_fake)
+                          .ayant_pour_lecteur_cb(lecteur_cb_fake)
+                          .ayant_pour_button_panel(button_panel_fake)
+                          .build())
+
+        # Ajouter 1 sucres pour le premier café
+        button_panel_fake.simuler_button_pressed(ButtonCode.BTN_SUGAR_PLUS)
+
+        # ET une CB est détectée
+        carte = CarteFake.default()
+        lecteur_cb_fake.simuler_cb_detectee(carte)
+
+        # ALORS la LED d'avertissement s'allume
+        self.assertLedWarning(button_panel_fake, True)   
+        # ET aucun café n'est demandé au hardware
+        self.assertCafeCommande(brewer_fake, False)
+        # ET la carte n'a pas été débitée
+        self.assertCarteDebitee(carte, 0)
+        # ET aucun sucre n'est distribué
+        self.assertPourSugar(brewer_fake, echec=True)
 
 if __name__ == '__main__':
     unittest.main()

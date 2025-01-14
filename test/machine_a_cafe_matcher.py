@@ -1,12 +1,4 @@
 import unittest
-from utilities.brewerSpy import BrewerSpy
-from utilities.brewerFake import BrewerFake
-from utilities.lecteurCBFake import LecteurCBFake
-from utilities.carteFake import CarteFake
-from utilities.buttonPanelFake import ButtonPanelFake
-from src.hardware.buttonpanel import ButtonCode
-from utilities.machine_a_cafe import MachineACafeBuilder
-
 
 class machine_a_cafe_matcher(unittest.TestCase):
     def assertCarteDebitee(self, carte, montant_attendu):
@@ -21,7 +13,6 @@ class machine_a_cafe_matcher(unittest.TestCase):
             attendu, result,
             f"Commande de café incorrecte. Attendu: {attendu}, Trouvé: {result}"
     )
-
 
     def assertLedWarning(self, button_panel, attendu):
         self.assertEqual(
